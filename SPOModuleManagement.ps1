@@ -26,6 +26,7 @@ $trustRepository = $false
 $updateModules = $true
 $ModuleNames = @(
     "AzureAD" ,
+    #"AzureAdPreview" ,
     "MSOnline",
     "AzureRM" ,
     "SharePointPnPPowerShellOnline" ,
