@@ -9,7 +9,7 @@
 .SYNOPSIS
     ...
 .DESCRIPTION
-    This script will attempt to configure the basic Package Providers and Modules needed for operating SharePoint Online
+    On Windows 10 - This script will attempt to configure Package Providers and Modules needed for operating SharePoint Online on Windows 10
 .LINK
     ...
 .EXAMPLE
