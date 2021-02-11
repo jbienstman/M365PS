@@ -19,8 +19,8 @@
     #>
     Param (
         [CmdletBinding(DefaultParameterSetName = 'useCertificateFullFilePath')]
-        [Parameter(Mandatory = $true, ParameterSetName = 'useCertificatePersonalStore')]
-        [Parameter(Mandatory = $true, ParameterSetName = 'useCertificateFullFilePath')][string]$Scope ,
+        [Parameter(Mandatory = $false, ParameterSetName = 'useCertificatePersonalStore')]
+        [Parameter(Mandatory = $false, ParameterSetName = 'useCertificateFullFilePath')][string]$Scope = "https://graph.microsoft.com/.default",
         #
         [Parameter(Mandatory = $true, ParameterSetName = 'useCertificatePersonalStore')]
         [Parameter(Mandatory = $true, ParameterSetName = 'useCertificateFullFilePath')][string]$TenantId ,
