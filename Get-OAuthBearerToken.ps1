@@ -7,6 +7,7 @@
     .EXAMPLE
         $CertificateFullFilePath = "c:\temp\certificatename.pfx"
         Get-OAuthBearerToken -Scope $Scope -TenantId $TenantId -ClientId $ClientId -useCertificateFullFilePath $CertificateFullFilePath
+    .EXAMPLE
         Get-OAuthBearerToken -Scope $Scope -TenantId $TenantId -ClientId $ClientId -useCertificatePersonalStore -CertificateThumbprint $CertificateThumbprint
     .INPUTS
         string, switch
