@@ -127,9 +127,8 @@
     #endregion - Create hash table "splat" for Invoke-Restmethod
     #region - Invoke RESTMethod
     $BearerToken = Invoke-RestMethod @restMethodSplat
-    $accessToken = $BearerToken.access_token
     #endregion - Invoke RESTMethod
     #region - Return
-    return $accessToken
+    return $BearerToken
     #endregion - Return
 }
