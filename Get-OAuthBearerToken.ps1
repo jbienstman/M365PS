@@ -1,4 +1,4 @@
-﻿Function Get-OAuthBearerToken {
+Function Get-OAuthBearerToken {
     <#
     .SYNOPSIS
         This function will use 'https://login.microsoftonline.com/$TenantId/oauth2/v2.0/token' to connect to a given API scope using an
@@ -19,6 +19,7 @@
     #>
     Param (
         [CmdletBinding(DefaultParameterSetName = 'useCertificateFullFilePath')]
+
         [Parameter(Mandatory = $false, ParameterSetName = 'useCertificatePersonalStore')]
         [Parameter(Mandatory = $false, ParameterSetName = 'useCertificateFullFilePath')][string]$Scope = "https://graph.microsoft.com/.default",
         #
@@ -30,7 +31,10 @@
         #
         [Parameter(Mandatory = $true, ParameterSetName = 'useCertificatePersonalStore')][switch]$useCertificatePersonalStore,
         [Parameter(Mandatory = $true, ParameterSetName = 'useCertificatePersonalStore')][string]$CertificateThumbprint,
-        [Parameter(Mandatory = $true, ParameterSetName = 'useCertificateFullFilePath')][string]$useCertificateFullFilePath
+        [Parameter(Mandatory = $true, ParameterSetName = 'useCertificateFullFilePath')][string]$useCertificateFullFilePath ,
+        #
+        [Parameter(Mandatory = $false, ParameterSetName = 'useCertificatePersonalStore')]
+        [Parameter(Mandatory = $false, ParameterSetName = 'useCertificateFullFilePath')][bool]$returnHeaders = $false
         )
     #region - Create base64 hash of certificate
     if ($useCertificatePersonalStore)
@@ -129,6 +133,18 @@
     $BearerToken = Invoke-RestMethod @restMethodSplat
     #endregion - Invoke RESTMethod
     #region - Return
-    return $BearerToken
+    if ($returnHeaders)
+        {
+        #region - Use BearerToken to build Headers for Invoke-RestMethod
+        $access_token = $BearerToken.access_token
+        $token_type = $BearerToken.token_type
+        $Headers = @{Authorization = "$token_type $access_token"}
+        #endregion - Use BearerToken to build Headers for Invoke-RestMethod
+        return $Headers
+        }
+    else
+        {
+        return $BearerToken
+        }
     #endregion - Return
 }
