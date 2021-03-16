@@ -1,7 +1,7 @@
 ﻿Function Get-SelfSignedCertificate {
     <#
     .SYNOPSIS
-        This function will create a self-signed certificate and place it in the "Cert:\CurrentUser\My\" CertStoreLocation and return CertificateThumbprint 
+        This function will create a self-signed certificate, register the certificate in the CertStoreLocation (default: "Cert:\CurrentUser\My\") and return CertificateThumbprint string
     .EXAMPLE
         $CertificateThumbprint = Get-SelfSignedCertificate -DnsName $DnsName -FriendlyName $FriendlyName -ExpirationInYears $ExpirationInYears -CerOutputPath $CerOutputPath -HashAlgorithm $HashAlgorithm -exportPrivateKey:$true
     .INPUTS
@@ -22,7 +22,6 @@
         [Parameter(Mandatory=$false)][string]$CertStoreLocation = "Cert:\CurrentUser\My\" # What cert store you want it to be in
         )
     #region - Static Variable(s)
-    
     $NotAfter = (Get-Date).AddYears($ExpirationInYears) # Expiration date of the new certificate
     #endregion - Static Variable(s)
     #region - Create hash table "splat" for New-SelfSignedCertificate parameters
@@ -50,11 +49,10 @@
     else
         {
         Export-Certificate -Cert $CertificatePath -FilePath $CerOutputPath | Out-Null # Export certificate without private key
-        }
-    
+        }    
     #endregion - Create & Export Certificate
     #region - Return
-    Write-Host $CertificateThumbprint -ForegroundColor Yellow
+    #Write-Host $CertificateThumbprint -ForegroundColor Yellow
     return $CertificateThumbprint
     #endregion - Return
 }
