@@ -3,7 +3,7 @@
     .SYNOPSIS
         This function will create a self-signed certificate and place it in the "Cert:\CurrentUser\My\" CertStoreLocation and return CertificateThumbprint 
     .EXAMPLE
-        $CertificateThumbprint = FunctionCreateSelfSignedCertificate -DnsName $DnsName -FriendlyName $FriendlyName -ExpirationInYears $ExpirationInYears -CerOutputPath $CerOutputPath
+        $CertificateThumbprint = Get-SelfSignedCertificate -DnsName $DnsName -FriendlyName $FriendlyName -ExpirationInYears $ExpirationInYears -CerOutputPath $CerOutputPath -HashAlgorithm $HashAlgorithm -exportPrivateKey:$true
     .INPUTS
         string, int
     .OUTPUTS
@@ -18,10 +18,11 @@
         [Parameter(Mandatory=$true)][int]$ExpirationInYears ,
         [Parameter(Mandatory=$true)][string]$CerOutputPath ,
         [Parameter(Mandatory=$false)][string]$HashAlgorithm = "SHA512" ,
-        [Parameter(Mandatory=$false)][string]$exportPrivateKey = $false
+        [Parameter(Mandatory=$false)][bool]$exportPrivateKey = $false ,
+        [Parameter(Mandatory=$false)][string]$CertStoreLocation = "Cert:\CurrentUser\My\" # What cert store you want it to be in
         )
     #region - Static Variable(s)
-    $CertStoreLocation = "Cert:\CurrentUser\My\" # What cert store you want it to be in
+    
     $NotAfter = (Get-Date).AddYears($ExpirationInYears) # Expiration date of the new certificate
     #endregion - Static Variable(s)
     #region - Create hash table "splat" for New-SelfSignedCertificate parameters
