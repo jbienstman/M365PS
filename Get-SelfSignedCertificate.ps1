@@ -1,9 +1,9 @@
-﻿Function Get-SelfSignedCertificate {
+Function Get-SelfSignedCertificate {
     <#
     .SYNOPSIS
         This function will create a self-signed certificate, register the certificate in the CertStoreLocation (default: "Cert:\CurrentUser\My\") and return CertificateThumbprint string
     .EXAMPLE
-        $CertificateThumbprint = Get-SelfSignedCertificate -DnsName $DnsName -FriendlyName $FriendlyName -ExpirationInYears $ExpirationInYears -CerOutputPath $CerOutputPath -HashAlgorithm $HashAlgorithm -exportPrivateKey:$true
+        $CertificateThumbprint = Get-SelfSignedCertificate -DnsName $DnsName -FriendlyName $FriendlyName -ExpirationInYears $ExpirationInYears -CerOutputPath $CerOutputPath -HashAlgorithm $HashAlgorithm -exportPrivateKey:$true -privateKeyPassword $privateKeyPassword
     .INPUTS
         string, int
     .OUTPUTS
@@ -19,7 +19,8 @@
         [Parameter(Mandatory=$true)][string]$CerOutputPath ,
         [Parameter(Mandatory=$false)][string]$HashAlgorithm = "SHA512" ,
         [Parameter(Mandatory=$false)][bool]$exportPrivateKey = $false ,
-        [Parameter(Mandatory=$false)][string]$CertStoreLocation = "Cert:\CurrentUser\My\" # What cert store you want it to be in
+        [Parameter(Mandatory=$false)][string]$CertStoreLocation = "Cert:\CurrentUser\My\" , # What cert store you want it to be in
+        [Parameter(Mandatory=$false)][string]$privateKeyPassword
         )
     #region - Static Variable(s)
     $NotAfter = (Get-Date).AddYears($ExpirationInYears) # Expiration date of the new certificate
@@ -42,13 +43,22 @@
     $CertificatePath = Join-Path -Path $CertStoreLocation -ChildPath $CertificateThumbprint # Get certificate path
     if ($exportPrivateKey)
         {
-        $passwordString = Read-Host ("Please a new password for exporting the private key")
-        $securePasswordString = ConvertTo-SecureString -String $passwordString -Force -AsPlainText
-        Export-PfxCertificate -Cert $CertificatePath -FilePath $CerOutputPath -Password $securePasswordString | Out-Null # Export certificate without private key
+        if ($privateKeyPassword -eq "")
+            {
+            $passwordString = Read-Host ("Please a new password for exporting the private key")
+            $securePasswordString = ConvertTo-SecureString -String $passwordString -Force -AsPlainText
+            }
+        else
+            {
+            $securePasswordString = ConvertTo-SecureString -String $privateKeyPassword -Force -AsPlainText
+            }
+        $FilePath = ($CerOutputPath.TrimEnd("\") + "\" + $FriendlyName + ".pfx")
+        Export-PfxCertificate -Cert $CertificatePath -FilePath $FilePath -Password $securePasswordString | Out-Null # Export certificate without private key
         }
     else
         {
-        Export-Certificate -Cert $CertificatePath -FilePath $CerOutputPath | Out-Null # Export certificate without private key
+        $FilePath = ($CerOutputPath.TrimEnd("\") + "\" + $FriendlyName + ".cer")
+        Export-Certificate -Cert $CertificatePath -FilePath $FilePath | Out-Null # Export certificate without private key
         }    
     #endregion - Create & Export Certificate
     #region - Return
