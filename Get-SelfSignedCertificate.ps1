@@ -20,8 +20,21 @@ Function Get-SelfSignedCertificate {
         [Parameter(Mandatory=$false)][string]$HashAlgorithm = "SHA512" ,
         [Parameter(Mandatory=$false)][bool]$exportPrivateKey = $false ,
         [Parameter(Mandatory=$false)][string]$CertStoreLocation = "Cert:\CurrentUser\My\" , # What cert store you want it to be in
-        [Parameter(Mandatory=$false)][string]$privateKeyPassword
+        [Parameter(Mandatory=$false)][string]$privateKeyPassword ,
+        [Parameter(Mandatory=$false)][string]$allowFriendlyNameDuplicates = $false
         )
+    #region - Check if Friendly Name already exists in $CertStoreLocation 
+    if ($allowFriendlyNameDuplicates -eq $false)
+        {
+        $friendlyNameMatches = Get-ChildItem $CertStoreLocation | Where-Object { $_.FriendlyName -eq $FriendlyName }
+        if ($friendlyNameMatches.Count -gt 0)
+            {
+            Write-Host ("The certificate friendly name is already present in: " + $CertStoreLocation) -ForegroundColor Red
+            $friendlyNameMatches | Format-Table ThumbPrint, Subject, FriendlyName
+            exit
+            }
+        }
+    #endregion - Check if Friendly Name already exists in $CertStoreLocation
     #region - Static Variable(s)
     $NotAfter = (Get-Date).AddYears($ExpirationInYears) # Expiration date of the new certificate
     #endregion - Static Variable(s)
