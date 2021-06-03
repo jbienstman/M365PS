@@ -54,6 +54,8 @@ Function Get-SelfSignedCertificate {
     $Certificate = New-SelfSignedCertificate @SelfSignedCertificateSplat # Create certificate
     $CertificateThumbprint = $Certificate.Thumbprint
     $CertificatePath = Join-Path -Path $CertStoreLocation -ChildPath $CertificateThumbprint # Get certificate path
+    $pfxFilePath = ($CerOutputPath.TrimEnd("\") + "\" + $FriendlyName + ".pfx")
+    $cerFilePath = ($CerOutputPath.TrimEnd("\") + "\" + $FriendlyName + ".cer")
     if ($exportPrivateKey)
         {
         if ($privateKeyPassword -eq "")
@@ -65,13 +67,12 @@ Function Get-SelfSignedCertificate {
             {
             $securePasswordString = ConvertTo-SecureString -String $privateKeyPassword -Force -AsPlainText
             }
-        $FilePath = ($CerOutputPath.TrimEnd("\") + "\" + $FriendlyName + ".pfx")
-        Export-PfxCertificate -Cert $CertificatePath -FilePath $FilePath -Password $securePasswordString | Out-Null # Export certificate without private key
+        Export-PfxCertificate -Cert $CertificatePath -FilePath $pfxFilePath -Password $securePasswordString | Out-Null # Export certificate WITH private key
+        Export-Certificate -Cert $CertificatePath -FilePath $cerFilePath | Out-Null # Export certificate without private key
         }
     else
         {
-        $FilePath = ($CerOutputPath.TrimEnd("\") + "\" + $FriendlyName + ".cer")
-        Export-Certificate -Cert $CertificatePath -FilePath $FilePath | Out-Null # Export certificate without private key
+        Export-Certificate -Cert $CertificatePath -FilePath $cerFilePath | Out-Null # Export certificate without private key
         }    
     #endregion - Create & Export Certificate
     #region - Return
