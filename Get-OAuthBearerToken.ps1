@@ -17,9 +17,8 @@ Function Get-OAuthBearerToken {
         Author:  Jim B.
         Website: https://github.com/jbienstman
     #>
+    [CmdletBinding(DefaultParameterSetName = 'useCertificateFullFilePath')]
     Param (
-        [CmdletBinding(DefaultParameterSetName = 'useCertificateFullFilePath')]
-
         [Parameter(Mandatory = $false, ParameterSetName = 'useCertificatePersonalStore')]
         [Parameter(Mandatory = $false, ParameterSetName = 'useCertificateFullFilePath')][string]$Scope = "https://graph.microsoft.com/.default",
         #
@@ -31,7 +30,7 @@ Function Get-OAuthBearerToken {
         #
         [Parameter(Mandatory = $true, ParameterSetName = 'useCertificatePersonalStore')][switch]$useCertificatePersonalStore,
         [Parameter(Mandatory = $true, ParameterSetName = 'useCertificatePersonalStore')][string]$CertificateThumbprint,
-        [Parameter(Mandatory = $true, ParameterSetName = 'useCertificateFullFilePath')][string]$useCertificateFullFilePath ,
+        [Parameter(Mandatory = $true, ParameterSetName = 'useCertificateFullFilePath')][switch]$useCertificateFullFilePath ,
         #
         [Parameter(Mandatory = $false, ParameterSetName = 'useCertificatePersonalStore')]
         [Parameter(Mandatory = $false, ParameterSetName = 'useCertificateFullFilePath')][bool]$returnHeaders = $false
