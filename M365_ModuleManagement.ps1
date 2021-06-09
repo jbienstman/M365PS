@@ -10,8 +10,11 @@
 .SYNOPSIS
     ...
 .DESCRIPTION
-    On Windows 10 - This script will attempt to configure Package Providers and Modules needed for operating SharePoint Online on Windows 10
-    When Package Providers need to be installed: several restarts of the script will be needed to load the dependencies  correctly
+    NOTE: This script is deprecated since it can only be used with Windows PowerShell, not PowerShell Core.
+    
+    On Windows 10 PowerShell - This script will attempt to configure Package Providers and Modules needed for operating SharePoint Online on Windows 10
+    When Package Providers need to be installed: several restarts of the script will be needed to load the dependencies  correctly  
+    
 .LINK
     ...
 .EXAMPLE
