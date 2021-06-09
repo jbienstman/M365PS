@@ -6,7 +6,8 @@ Function Get-OAuthBearerToken {
         When connecting to the $Scope API presenting the OAuth Bearer Token, you will act as the App Registration with all pre-defined API permissions.
 
         NOTE: When "useCertificateFullFilePath" parameter set is used, you need to provide a full path to a ".pfx" certificate file (incl. Private Key)
-        accessible by the account running the script, ("c:\temp\certificatename.pfx"), you will be prompted for the private key password!
+        accessible by the account running the script, ("c:\temp\certificatename.pfx"), unless you provide a secure string for the $pfxPasswordSecure parameter,
+        you will be prompted for the private key password interactively.
 
         NOTE: When "useCertificateThumbprint" parameter set is used, you need to provide the thumbprint of a certificate which is already installed
         in your personal certificate store (Cert:\CurrentUser\My\THUMBPRINT)
