@@ -1,14 +1,22 @@
 Function Get-OAuthBearerToken {
     <#
     .SYNOPSIS
-        This function will use 'https://login.microsoftonline.com/$TenantId/oauth2/v2.0/token' to connect to a given API scope using an
-        OAuth Certificate Authenticated App Registration and return the Bearer Access Token.
-        NOTE: When using a useCertificateFullFilePath this needs to be a .pfx and you will be prompted for the private key password
+        This function use a certificate to connect to 'https://login.microsoftonline.com/$TenantId/oauth2/v2.0/token' using OAuth to an
+        existing "App Registration" in M365, then builds and returns a OAuth Bearer Access Token for use with $Scope (.default API Endpoint)
+        When connecting to the $Scope API presenting the OAuth Bearer Token, you will act as the App Registration with all pre-defined API permissions.
+
+        NOTE: When "useCertificateFullFilePath" parameter set is used, you need to provide a full path to a ".pfx" certificate file (incl. Private Key)
+        accessible by the account running the script, ("c:\temp\certificatename.pfx"), you will be prompted for the private key password!
+
+        NOTE: When "useCertificateThumbprint" parameter set is used, you need to provide the thumbprint of a certificate which is already installed
+        in your personal certificate store (Cert:\CurrentUser\My\THUMBPRINT)
+
     .EXAMPLE
-        $CertificateFullFilePath = "c:\temp\certificatename.pfx"
+        $CertificateFullFilePath = "c:\foldername\certificatename.pfx"
         Get-OAuthBearerToken -Scope $Scope -TenantId $TenantId -ClientId $ClientId -useCertificateFullFilePath $CertificateFullFilePath
     .EXAMPLE
-        Get-OAuthBearerToken -Scope $Scope -TenantId $TenantId -ClientId $ClientId -useCertificatePersonalStore -CertificateThumbprint $CertificateThumbprint
+        $CertificateThumbprint = "ABCDEF0123456789ABCDEF0123456789ABCDEF01"
+        Get-OAuthBearerToken -Scope $Scope -TenantId $TenantId -ClientId $ClientId -useCertificateThumbprint $CertificateThumbprint
     .INPUTS
         string, switch
     .OUTPUTS
@@ -19,30 +27,38 @@ Function Get-OAuthBearerToken {
     #>
     [CmdletBinding(DefaultParameterSetName = 'useCertificateFullFilePath')]
     Param (
-        [Parameter(Mandatory = $false, ParameterSetName = 'useCertificatePersonalStore')]
+        [Parameter(Mandatory = $false, ParameterSetName = 'useCertificateThumbprint')]
         [Parameter(Mandatory = $false, ParameterSetName = 'useCertificateFullFilePath')][string]$Scope = "https://graph.microsoft.com/.default",
         #
-        [Parameter(Mandatory = $true, ParameterSetName = 'useCertificatePersonalStore')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'useCertificateThumbprint')]
         [Parameter(Mandatory = $true, ParameterSetName = 'useCertificateFullFilePath')][string]$TenantId ,
         #
-        [Parameter(Mandatory = $true, ParameterSetName = 'useCertificatePersonalStore')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'useCertificateThumbprint')]
         [Parameter(Mandatory = $true, ParameterSetName = 'useCertificateFullFilePath')][string]$ClientId ,
         #
-        [Parameter(Mandatory = $true, ParameterSetName = 'useCertificatePersonalStore')][switch]$useCertificatePersonalStore,
-        [Parameter(Mandatory = $true, ParameterSetName = 'useCertificatePersonalStore')][string]$CertificateThumbprint,
-        [Parameter(Mandatory = $true, ParameterSetName = 'useCertificateFullFilePath')][switch]$useCertificateFullFilePath ,
+        [Parameter(Mandatory = $true, ParameterSetName = 'useCertificateThumbprint')][string]$useCertificateThumbprint,
         #
-        [Parameter(Mandatory = $false, ParameterSetName = 'useCertificatePersonalStore')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'useCertificateFullFilePath')][string]$useCertificateFullFilePath ,
+        [Parameter(Mandatory = $false, ParameterSetName = 'useCertificateFullFilePath')][SecureString]$pfxPasswordSecure ,
+        #
+        [Parameter(Mandatory = $false, ParameterSetName = 'useCertificateThumbprint')]
         [Parameter(Mandatory = $false, ParameterSetName = 'useCertificateFullFilePath')][bool]$returnHeaders = $false
         )
     #region - Create base64 hash of certificate
-    if ($useCertificatePersonalStore)
+    if ($useCertificateThumbprint)
         {
-        $Certificate = Get-Item Cert:\CurrentUser\My\$CertificateThumbprint
+        $Certificate = Get-Item Cert:\CurrentUser\My\$useCertificateThumbprint
         }
     else
         {
-        $Certificate = Get-PfxCertificate -FilePath $useCertificateFullFilePath
+            if ($pfxPasswordSecure)
+                {
+                    $Certificate = Get-PfxCertificate -FilePath $useCertificateFullFilePath -Password $pfxPasswordSecure #must be a secure string
+                }
+            else
+                {
+                    $Certificate = Get-PfxCertificate -FilePath $useCertificateFullFilePath #will prompt for password
+                }
         }
     $CertificateBase64Hash = [System.Convert]::ToBase64String($Certificate.GetCertHash())
     #endregion - Create base64 hash of certificate
@@ -124,7 +140,7 @@ Function Get-OAuthBearerToken {
         ContentType = 'application/x-www-form-urlencoded'
         Method = 'POST'
         Uri = $Uri
-        Body = $Body    
+        Body = $Body
         Headers = $Header
         }
     #endregion - Create hash table "splat" for Invoke-Restmethod
