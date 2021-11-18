@@ -13,11 +13,22 @@ Function Get-OAuthBearerToken {
         in your personal certificate store (Cert:\CurrentUser\My\THUMBPRINT)
 
     .EXAMPLE
-        $CertificateFullFilePath = "c:\foldername\certificatename.pfx"
-        Get-OAuthBearerToken -Scope $Scope -TenantId $TenantId -ClientId $ClientId -useCertificateFullFilePath $CertificateFullFilePath
-    .EXAMPLE
         $CertificateThumbprint = "ABCDEF0123456789ABCDEF0123456789ABCDEF01"
+        #
+        $TenantId = "GUID"
+        $ClientId = "GUID"
+        $Scope = "https://graph.microsoft.com/.default"
         Get-OAuthBearerToken -Scope $Scope -TenantId $TenantId -ClientId $ClientId -useCertificateThumbprint $CertificateThumbprint
+
+    .EXAMPLE
+        $CertificateFullFilePath = "C:\folder\certificatefilename.pfx"
+        $pfxPasswordSecure = ConvertTo-SecureString "Pass@word1" -AsPlainText -Force
+        #
+        $TenantId = "GUID"
+        $ClientId = "GUID"
+        $Scope = "https://graph.microsoft.com/.default"
+        $Headers = Get-OAuthBearerToken -Scope $Scope -TenantId $TenantId -ClientId $ClientId -returnHeaders:$true -useCertificateFullFilePath $CertificateFullFilePath -pfxPasswordSecure $pfxPasswordSecure
+
     .INPUTS
         string, switch
     .OUTPUTS
@@ -29,7 +40,7 @@ Function Get-OAuthBearerToken {
     [CmdletBinding(DefaultParameterSetName = 'useCertificateFullFilePath')]
     Param (
         [Parameter(Mandatory = $false, ParameterSetName = 'useCertificateThumbprint')]
-        [Parameter(Mandatory = $false, ParameterSetName = 'useCertificateFullFilePath')][string]$Scope = "https://graph.microsoft.com/.default",
+        [Parameter(Mandatory = $true, ParameterSetName = 'useCertificateFullFilePath')][string]$Scope,
         #
         [Parameter(Mandatory = $true, ParameterSetName = 'useCertificateThumbprint')]
         [Parameter(Mandatory = $true, ParameterSetName = 'useCertificateFullFilePath')][string]$TenantId ,
