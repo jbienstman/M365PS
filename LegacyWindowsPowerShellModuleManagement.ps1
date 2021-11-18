@@ -64,7 +64,7 @@ if ($installPackageProviders -eq $true)
         Write-Host (" [" + $i + "/" + $packageProviderNames.Count + "] " + $packageProviderName) -NoNewline -ForegroundColor Gray
         $newestPackageProvider = Find-PackageProvider -Name $packageProviderName -AllVersions | Select-Object -First 1
         $installedPackageProvider = Get-PackageProvider -Name $packageProviderName -WarningAction SilentlyContinue -ErrorAction SilentlyContinue -InformationAction SilentlyContinue
-        if ($installedPackageProvider -eq $null)
+        if ($null -eq $installedPackageProvider)
             {
             Write-Host ("Installing Package Provider (" + $newestPackageProvider.Version + ")") -NoNewline
             Install-PackageProvider -Name $packageProviderName -MinimumVersion $newestPackageProvider.Version -Force
@@ -116,7 +116,7 @@ if ($updateModules -eq $true)
         Write-Host (" [" + $i + "/" + $ModuleNames.Count + "] " + $ModuleName) -NoNewline -ForegroundColor Gray
         $newestModule = Find-Module -Name $ModuleName -AllVersions | Select-Object -First 1
         $InstalledModule = Get-InstalledModule -Name $ModuleName -WarningAction SilentlyContinue -ErrorAction SilentlyContinue -InformationAction SilentlyContinue
-        if ($InstalledModule -eq $null)
+        if ($null -eq $InstalledModule)
             {
             Write-Host (" - Installing Module (" + $newestModule.Version + ")") -NoNewline
             Install-Module -Name $newestModule.Name -RequiredVersion $newestModule.Version -Confirm:$false -AllowClobber -Force

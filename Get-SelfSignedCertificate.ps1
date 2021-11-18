@@ -10,20 +10,20 @@ Function Get-SelfSignedCertificate {
         string (CertificateThumbprint), certificate file with or without private key
     .NOTES
         Author:  Jim B.
-        Website: https://github.com/jbienstman            
+        Website: https://github.com/jbienstman
     #>
     Param (
-        [Parameter(Mandatory=$true)][string]$DnsName ,            
+        [Parameter(Mandatory=$true)][string]$DnsName ,
         [Parameter(Mandatory=$true)][string]$FriendlyName ,
         [Parameter(Mandatory=$true)][int]$ExpirationInYears ,
         [Parameter(Mandatory=$true)][string]$CerOutputPath ,
         [Parameter(Mandatory=$false)][string]$HashAlgorithm = "SHA512" ,
         [Parameter(Mandatory=$false)][bool]$exportPrivateKey = $false ,
         [Parameter(Mandatory=$false)][string]$CertStoreLocation = "Cert:\CurrentUser\My\" , # What cert store you want it to be in
-        [Parameter(Mandatory=$false)][string]$privateKeyPassword ,
+        [Parameter(Mandatory=$false)][SecureString]$privateKeyPassword ,
         [Parameter(Mandatory=$false)][string]$allowFriendlyNameDuplicates = $false
         )
-    #region - Check if Friendly Name already exists in $CertStoreLocation 
+    #region - Check if Friendly Name already exists in $CertStoreLocation
     if ($allowFriendlyNameDuplicates -eq $false)
         {
         $friendlyNameMatches = Get-ChildItem $CertStoreLocation | Where-Object { $_.FriendlyName -eq $FriendlyName }
@@ -73,7 +73,7 @@ Function Get-SelfSignedCertificate {
     else
         {
         Export-Certificate -Cert $CertificatePath -FilePath $cerFilePath | Out-Null # Export certificate without private key
-        }    
+        }
     #endregion - Create & Export Certificate
     #region - Return
     #Write-Host $CertificateThumbprint -ForegroundColor Yellow
