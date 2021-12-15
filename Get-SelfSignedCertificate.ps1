@@ -11,8 +11,6 @@ Function Get-SelfSignedCertificate {
     .NOTES
         Author:  Jim B.
         Website: https://github.com/jbienstman
-        WARNING: 2021-12-15 - At this time, when feeding the $privateKeyPassword parameter directly, the password doesn't get saved correctly. For now please have the script
-        prompt you for the password - this works as expected.
     #>
     Param (
         [Parameter(Mandatory=$true)][string]$DnsName ,
@@ -22,7 +20,7 @@ Function Get-SelfSignedCertificate {
         [Parameter(Mandatory=$false)][string]$HashAlgorithm = "SHA512" ,
         [Parameter(Mandatory=$false)][bool]$exportPrivateKey = $false ,
         [Parameter(Mandatory=$false)][string]$CertStoreLocation = "Cert:\CurrentUser\My\" , # What cert store you want it to be in
-        [Parameter(Mandatory=$false)][SecureString]$privateKeyPassword ,
+        [Parameter(Mandatory=$false)][string]$privateKeyPassword ,
         [Parameter(Mandatory=$false)][string]$allowFriendlyNameDuplicates = $false
         )
     #region - Check if Friendly Name already exists in $CertStoreLocation
@@ -60,9 +58,9 @@ Function Get-SelfSignedCertificate {
     $cerFilePath = ($CerOutputPath.TrimEnd("\") + "\" + $FriendlyName + ".cer")
     if ($exportPrivateKey)
         {
-        if ($privateKeyPassword -eq "")
+        if ($privateKeyPassword -eq "" -or $null -eq $privateKeyPassword)
             {
-            $passwordString = Read-Host ("Please a new password for exporting the private key")
+            $passwordString = Read-Host ("Please a password for exporting the private key")
             $securePasswordString = ConvertTo-SecureString -String $passwordString -Force -AsPlainText
             }
         else
