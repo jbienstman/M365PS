@@ -11,6 +11,8 @@ Function Get-SelfSignedCertificate {
     .NOTES
         Author:  Jim B.
         Website: https://github.com/jbienstman
+        WARNING: 2021-12-15 - At this time, when feeding the $privateKeyPassword parameter directly, the password doesn't get saved correctly. For now please have the script
+        prompt you for the password - this works as expected.
     #>
     Param (
         [Parameter(Mandatory=$true)][string]$DnsName ,
