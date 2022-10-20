@@ -35,10 +35,8 @@ Function Get-SelfSignedCertificate {
             }
         }
     #endregion - Check if Friendly Name already exists in $CertStoreLocation
-    #region - Static Variable(s)
-    $NotAfter = (Get-Date).AddYears($ExpirationInYears) # Expiration date of the new certificate
-    #endregion - Static Variable(s)
     #region - Create hash table "splat" for New-SelfSignedCertificate parameters
+    $NotAfter = (Get-Date).AddYears($ExpirationInYears) # Expiration date of the new certificate
     $SelfSignedCertificateSplat = @{
         FriendlyName      = $FriendlyName
         DnsName           = $DnsName
@@ -51,7 +49,7 @@ Function Get-SelfSignedCertificate {
     }
     #endregion -  Create hash table "splat" for New-SelfSignedCertificate parameters
     #region - Create & Export Certificate
-    $Certificate = New-SelfSignedCertificate @SelfSignedCertificateSplat # Create certificate
+    $Certificate = New-SelfSignedCertificate @SelfSignedCertificateSplat # Create certificate & register in certificate store
     $CertificateThumbprint = $Certificate.Thumbprint
     $CertificatePath = Join-Path -Path $CertStoreLocation -ChildPath $CertificateThumbprint # Get certificate path
     $pfxFilePath = ($CerOutputPath.TrimEnd("\") + "\" + $FriendlyName + ".pfx")
@@ -60,7 +58,7 @@ Function Get-SelfSignedCertificate {
         {
         if ($privateKeyPassword -eq "" -or $null -eq $privateKeyPassword)
             {
-            $passwordString = Read-Host ("Please a password for exporting the private key")
+            $passwordString = Read-Host ("Please enter a password for exporting the private key")
             $securePasswordString = ConvertTo-SecureString -String $passwordString -Force -AsPlainText
             }
         else
@@ -76,7 +74,6 @@ Function Get-SelfSignedCertificate {
         }
     #endregion - Create & Export Certificate
     #region - Return
-    #Write-Host $CertificateThumbprint -ForegroundColor Yellow
     return $CertificateThumbprint
     #endregion - Return
 }
