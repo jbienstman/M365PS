@@ -21,7 +21,8 @@ Function Get-SelfSignedCertificate {
         [Parameter(Mandatory=$false)][bool]$exportPrivateKey = $false ,
         [Parameter(Mandatory=$false)][string]$CertStoreLocation = "Cert:\CurrentUser\My\" , # What cert store you want it to be in
         [Parameter(Mandatory=$false)][string]$privateKeyPassword ,
-        [Parameter(Mandatory=$false)][string]$allowFriendlyNameDuplicates = $false
+        [Parameter(Mandatory=$false)][bool]$allowFriendlyNameDuplicates = $false ,
+        [Parameter(Mandatory=$false)][bool]$savePrivateKeyPasswordTxtFile = $true
         )
     #region - Check if Friendly Name already exists in $CertStoreLocation
     if ($allowFriendlyNameDuplicates -eq $false)
@@ -54,6 +55,7 @@ Function Get-SelfSignedCertificate {
     $CertificatePath = Join-Path -Path $CertStoreLocation -ChildPath $CertificateThumbprint # Get certificate path
     $pfxFilePath = ($CerOutputPath.TrimEnd("\") + "\" + $FriendlyName + ".pfx")
     $cerFilePath = ($CerOutputPath.TrimEnd("\") + "\" + $FriendlyName + ".cer")
+    $cpwFilePath = ($CerOutputPath.TrimEnd("\") + "\" + $FriendlyName + ".txt")
     if ($exportPrivateKey)
         {
         if ($privateKeyPassword -eq "" -or $null -eq $privateKeyPassword)
@@ -71,6 +73,10 @@ Function Get-SelfSignedCertificate {
     else
         {
         Export-Certificate -Cert $CertificatePath -FilePath $cerFilePath | Out-Null # Export certificate without private key
+        }
+    if ($savePrivateKeyPasswordTxtFile)
+        {
+        $privateKeyPassword | Out-File -LiteralPath $cpwFilePath -Encoding utf8 -Force
         }
     #endregion - Create & Export Certificate
     #region - Return
